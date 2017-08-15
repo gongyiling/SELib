@@ -129,9 +129,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <Text Include="ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="SEAnim.h" />
   </ItemGroup>
   <ItemGroup>
