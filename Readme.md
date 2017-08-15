@@ -1,3 +1,3 @@
 # SELib
 
-A portable open-source SEAnim and SEModel library for C
+A portable open-source SEAnim and SEModel library for C.

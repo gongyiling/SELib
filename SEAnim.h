@@ -6,6 +6,9 @@ extern "C"
 {
 #endif
 #include <stdint.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 
 // Define attributes of all API symbols declarations, e.g. for DLL under Windows.
 #ifndef SEANIM_API
@@ -18,11 +21,47 @@ extern "C"
 #define SEANIM_ASSERT(_EXPR) assert(_EXPR)
 #endif
 
-#define SEANIM_SPEC_VERSION "1.0.1"
-#define SEANIM_LIB_VERSION "1.0"
+// Define custom malloc
+#ifndef SEANIM_MALLOC
+#define SEANIM_MALLOC malloc
+#endif
 
-	typedef float vec3_t[3];
-	typedef float quat_t[4]; // X Y Z W (Normalized)
+// Define custom calloc
+#ifndef SEANIM_CALLOC
+#define SEANIM_CALLOC calloc
+#endif
+
+// Define custom free
+#ifndef SEANIM_FREE
+#define SEANIM_FREE free
+#endif
+
+///////////////////////////////
+// Custom filesystem defines //
+///////////////////////////////
+#define SEANIM_FS_HANDLE FILE*
+
+#ifndef SEANIM_FWRITE
+#define SEANIM_FWRITE(ptr, elementSize, elementCount, fileHandle) fwrite(ptr, elementSize, elementCount, fileHandle)
+#endif
+
+#ifndef SEANIM_FREAD
+#define SEANIM_FREAD(ptr, elementSize, elementCount, fileHandle) fread(ptr, elementSize, elementCount, fileHandle)
+#endif
+
+// Error codes
+#define SEANIM_OK 0
+#define SEANIM_WRONG_MAGIC 1
+#define SEANIM_WRONG_VERSION 2
+#define SEANIM_UNKNOWN_ERROR -1
+
+#define SEANIM_VERSION			1
+#define SEANIM_MAGIC			"SEAnim"
+#define SEANIM_SPEC_VERSION		"1.0.1"
+#define SEANIM_LIB_VERSION		"1.0"
+
+	typedef double vec3_t[3];
+	typedef double quat_t[4]; // X Y Z W (Normalized)
 
 	// Specifies how the data is interpreted by the importer
 	enum SEAnim_AnimationType
@@ -182,7 +221,7 @@ extern "C"
 		uint16_t version;	// The file version - the current version is 0x1
 		SEAnim_Header_t header;
 
-		uint8_t						*bone;
+		uint8_t						**bone;
 		SEAnim_BoneAnimModifier_t	*boneModifiers;
 		SEAnim_BoneData_t			*boneData;
 
@@ -194,8 +233,8 @@ extern "C"
 
 	} SEAnim_File_t;
 
-
-	int SEANIM_API LoadSEAnim(SEAnim_File_t *dest, uint8_t buf, uint64_t bufSize);
+	int SEANIM_API LoadSEAnim(SEAnim_File_t *dest, SEANIM_FS_HANDLE handle);
+	
 
 #ifdef __cplusplus
 }

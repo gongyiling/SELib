@@ -7,6 +7,9 @@
 *.userosscache
 *.sln.docstates
 
+# SEAnims
+*.seanim
+
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
