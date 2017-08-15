@@ -1,5 +1,10 @@
+
+
+
 #ifndef __SEANIM_H
 #define __SEANIM_H
+
+#include "SEAnim_config.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -21,24 +26,24 @@ extern "C"
 #define SEANIM_ASSERT(_EXPR) assert(_EXPR)
 #endif
 
-// Define custom malloc
+// Define malloc
 #ifndef SEANIM_MALLOC
 #define SEANIM_MALLOC malloc
 #endif
 
-// Define custom calloc
+// Define calloc
 #ifndef SEANIM_CALLOC
 #define SEANIM_CALLOC calloc
 #endif
 
-// Define custom free
+// Define free
 #ifndef SEANIM_FREE
 #define SEANIM_FREE free
 #endif
 
-///////////////////////////////
-// Custom filesystem defines //
-///////////////////////////////
+////////////////////////
+// Filesystem defines //
+////////////////////////
 #define SEANIM_FS_HANDLE FILE*
 
 #ifndef SEANIM_FWRITE

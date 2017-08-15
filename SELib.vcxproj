@@ -130,6 +130,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="SEAnim.h" />
+    <ClInclude Include="SEAnim_config.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SEAnim.c">

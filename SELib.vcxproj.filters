@@ -18,6 +18,9 @@
     <ClInclude Include="SEAnim.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="SEAnim_config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SEAnim.c">

@@ -66,7 +66,6 @@ int SEANIM_API LoadSEAnim(SEAnim_File_t *dest, SEANIM_FS_HANDLE handle)
 	}
 
 	numSize = (dest->header.frameCount <= 0xFF ? 1 : (dest->header.frameCount <= 0xFFFF ? 2 : 4));
-	int pos = 0;
 	dest->boneData = (SEAnim_BoneData_t*)SEANIM_CALLOC(dest->header.boneCount, sizeof(SEAnim_BoneData_t));
 	for (uint32_t i = 0; i < dest->header.boneCount; i++)
 	{
@@ -135,7 +134,6 @@ int SEANIM_API LoadSEAnim(SEAnim_File_t *dest, SEANIM_FS_HANDLE handle)
 				SEAnim_Printf("Frame %u (Bone %d): loc %f %f %f\n", dest->boneData[i].loc[o].frame, i, dest->boneData[i].loc[o].loc[0], dest->boneData[i].loc[o].loc[1], dest->boneData[i].loc[o].loc[2]);
 			}
 		}
-		pos = ftell(handle);
 		if (dest->header.dataPresenceFlags & SEANIM_BONE_ROT)
 		{
 			uint8_t v8 = 0;
