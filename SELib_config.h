@@ -1,8 +1,9 @@
-#ifndef __SEANIM_CONFIG_H
-#define __SEANIM_CONFIG_H
+#ifndef __SELIB_CONFIG_H
+#define __SELIB_CONFIG_H
 
 // Define attributes of all API symbols declarations, e.g. for DLL under Windows.
-//#define SEANIM_API
+//#define SEANIM_API __declspec( dllexport )
+//#define SEANIM_API __declspec( dllimport )
 
 // Define assertion handler.
 //#define SEANIM_ASSERT(_EXPR) assert(_EXPR)

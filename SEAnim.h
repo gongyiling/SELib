@@ -1,58 +1,29 @@
+/*
 
+How to load SEAnims
+
+	SEAnim_File_t seanimFile; // create the SEAnim var
+	FILE* f;
+	f = fopen("ch_idle.seanim","rb");
+	int r = LoadSEAnim(&seanimFile, f);
+
+That's it! Simple as that.
+You can access every bit of information that was stored in the SEAnim in the var.
+
+How to save SEAnims
+// TODO
+
+*/
 
 
 #ifndef __SEANIM_H
 #define __SEANIM_H
 
-#include "SEAnim_config.h"
-
 #ifdef __cplusplus
 extern "C"
 {
 #endif
-#include <stdint.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-
-// Define attributes of all API symbols declarations, e.g. for DLL under Windows.
-#ifndef SEANIM_API
-#define SEANIM_API
-#endif
-
-// Define assertion handler.
-#ifndef SEANIM_ASSERT
-#include <assert.h>
-#define SEANIM_ASSERT(_EXPR) assert(_EXPR)
-#endif
-
-// Define malloc
-#ifndef SEANIM_MALLOC
-#define SEANIM_MALLOC malloc
-#endif
-
-// Define calloc
-#ifndef SEANIM_CALLOC
-#define SEANIM_CALLOC calloc
-#endif
-
-// Define free
-#ifndef SEANIM_FREE
-#define SEANIM_FREE free
-#endif
-
-////////////////////////
-// Filesystem defines //
-////////////////////////
-#define SEANIM_FS_HANDLE FILE*
-
-#ifndef SEANIM_FWRITE
-#define SEANIM_FWRITE(ptr, elementSize, elementCount, fileHandle) fwrite(ptr, elementSize, elementCount, fileHandle)
-#endif
-
-#ifndef SEANIM_FREAD
-#define SEANIM_FREAD(ptr, elementSize, elementCount, fileHandle) fread(ptr, elementSize, elementCount, fileHandle)
-#endif
+#include "SELib.h"
 
 // Error codes
 #define SEANIM_OK 0
@@ -226,6 +197,8 @@ extern "C"
 		uint16_t version;	// The file version - the current version is 0x1
 		SEAnim_Header_t header;
 
+		uint8_t			isLoaded;
+
 		uint8_t						**bone;
 		SEAnim_BoneAnimModifier_t	*boneModifiers;
 		SEAnim_BoneData_t			*boneData;
@@ -238,7 +211,11 @@ extern "C"
 
 	} SEAnim_File_t;
 
-	int SEANIM_API LoadSEAnim(SEAnim_File_t *dest, SEANIM_FS_HANDLE handle);
+	int SELIB_API LoadSEAnim(SEAnim_File_t *dest, SELIB_FS_HANDLE handle);
+
+	int SELIB_API SaveSEAnim(SEAnim_File_t *src, SELIB_FS_HANDLE destHandle);
+
+	void SELIB_API FreeSEAnim(SEAnim_File_t *ptr);
 	
 
 #ifdef __cplusplus
