@@ -21,6 +21,7 @@ int main(int argc, char *argv[])
 	FILE* f;
 	fopen_s(&f, argv[1], "rb");
 	int r = LoadSEAnim(&seanim, f);
+	fclose(f);
 	if (r != 0)
 	{
 		printf("Error: %d\n", r);
@@ -40,6 +41,7 @@ int main(int argc, char *argv[])
 	printf("Bone Count: %u\n", seanim.header.boneCount);
 	printf("Bone Anim Modifier Count: %u\n", seanim.header.boneAnimModifierCount);
 	printf("Note Count: %u\n", seanim.header.noteCount);
+	FreeSEAnim(&seanim);
     return 0;
 }
 
