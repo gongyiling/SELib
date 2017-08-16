@@ -33,6 +33,11 @@ extern "C"
 #define SELIB_CALLOC calloc
 #endif
 
+// Define realloc
+#ifndef SELIB_REALLOC
+#define SELIB_REALLOC realloc
+#endif
+
 // Define free
 #ifndef SELIB_FREE
 #define SELIB_FREE free

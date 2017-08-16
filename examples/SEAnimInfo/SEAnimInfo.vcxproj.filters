@@ -13,21 +13,39 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="SEAnim">
+      <UniqueIdentifier>{a368b12a-9955-454b-9531-70baf625cfac}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="SEAnim.h">
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SELib_config.h">
+    <ClInclude Include="targetver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SELib.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\..\SEAnim.h">
+      <Filter>SEAnim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SELib.h">
+      <Filter>SEAnim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SELib_config.h">
+      <Filter>SEAnim</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="SEAnim.c">
+    <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SEAnimInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SEAnim.c">
+      <Filter>SEAnim</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

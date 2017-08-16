@@ -14,6 +14,9 @@
 // Define custom calloc
 //#define SEANIM_CALLOC calloc
 
+// Define custom realloc
+//#define SEANIM_REALLOC realloc
+
 // Define custom free
 //#define SEANIM_FREE free
 

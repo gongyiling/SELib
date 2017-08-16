@@ -23,25 +23,26 @@ int SELIB_API LoadSEAnim(SEAnim_File_t *dest, SELIB_FS_HANDLE handle)
 
 	SELIB_FREAD(&dest->header, sizeof(SEAnim_Header_t), 1, handle);
 
-	dest->bone = (uint8_t**)SEANIM_CALLOC(dest->header.boneCount, sizeof(uint8_t*));
-
+	dest->bone = (uint8_t**)SELIB_CALLOC(dest->header.boneCount, sizeof(uint8_t*));
 	for (uint32_t i = 0; i < dest->header.boneCount; i++)
 	{
-		dest->bone[i] = (uint8_t*)SEANIM_CALLOC(64, sizeof(uint8_t));
-		memset(dest->bone[i], 0xcc, 64);
+		dest->bone[i] = (uint8_t*)SELIB_CALLOC(1, sizeof(uint8_t));
+		dest->bone[i][0] = 0xcc;
 		int stri = 0;
 		char started = 0;
 		while (dest->bone[i][stri] != 0)
 		{
 			if (started) stri++;
 			else started = 1;
+			dest->bone[i] = SELIB_REALLOC(dest->bone[i], stri + 1);
 			SELIB_FREAD(&dest->bone[i][stri], 1, 1, handle);
 		}
+
 		SELib_Printf("Bone %u: %s\n", i, dest->bone[i]);
 	}
 
 	int numSize = (dest->header.boneCount <= 0xFF ? 1 : (dest->header.boneCount <= 0xFFFF ? 2 : 4));
-	dest->boneModifiers = (SEAnim_BoneAnimModifier_t *)SEANIM_CALLOC(dest->header.boneAnimModifierCount, sizeof(SEAnim_BoneAnimModifier_t));
+	dest->boneModifiers = (SEAnim_BoneAnimModifier_t *)SELIB_CALLOC(dest->header.boneAnimModifierCount, sizeof(SEAnim_BoneAnimModifier_t));
 	for (uint8_t i = 0; i < dest->header.boneAnimModifierCount; i++)
 	{
 		uint8_t v8 = 0;
@@ -62,7 +63,7 @@ int SELIB_API LoadSEAnim(SEAnim_File_t *dest, SELIB_FS_HANDLE handle)
 			dest->boneModifiers[i].index = (uint32_t)v32;
 			break;
 		default:
-			SEANIM_ASSERT(0); // should never ever happen.... ever
+			SELIB_ASSERT(0); // should never ever happen.... ever
 			break;
 		}
 		SELIB_FREAD(&dest->boneModifiers[i].animTypeOverride, 1, 1, handle);
@@ -70,7 +71,7 @@ int SELIB_API LoadSEAnim(SEAnim_File_t *dest, SELIB_FS_HANDLE handle)
 	}
 
 	numSize = (dest->header.frameCount <= 0xFF ? 1 : (dest->header.frameCount <= 0xFFFF ? 2 : 4));
-	dest->boneData = (SEAnim_BoneData_t*)SEANIM_CALLOC(dest->header.boneCount, sizeof(SEAnim_BoneData_t));
+	dest->boneData = (SEAnim_BoneData_t*)SELIB_CALLOC(dest->header.boneCount, sizeof(SEAnim_BoneData_t));
 	for (uint32_t i = 0; i < dest->header.boneCount; i++)
 	{
 		SELIB_FREAD(&dest->boneData[i].flags, 1, 1, handle);
@@ -94,11 +95,11 @@ int SELIB_API LoadSEAnim(SEAnim_File_t *dest, SELIB_FS_HANDLE handle)
 				dest->boneData[i].locKeyCount = (uint32_t)v32;
 				break;
 			default:
-				SEANIM_ASSERT(0); // should never ever happen.... ever
+				SELIB_ASSERT(0); // should never ever happen.... ever
 				break;
 			}
 
-			dest->boneData[i].loc = (SEAnim_BoneLocData_t*)SEANIM_CALLOC(dest->boneData[i].locKeyCount, sizeof(SEAnim_BoneLocData_t));
+			dest->boneData[i].loc = (SEAnim_BoneLocData_t*)SELIB_CALLOC(dest->boneData[i].locKeyCount, sizeof(SEAnim_BoneLocData_t));
 			for (uint32_t o = 0; o < dest->boneData[i].locKeyCount; o++)
 			{
 				switch (numSize)
@@ -116,14 +117,12 @@ int SELIB_API LoadSEAnim(SEAnim_File_t *dest, SELIB_FS_HANDLE handle)
 					dest->boneData[i].loc[o].frame = (uint32_t)v32;
 					break;
 				default:
-					SEANIM_ASSERT(0); // should never ever happen.... ever
+					SELIB_ASSERT(0); // should never ever happen.... ever
 					break;
 				}
 				if (dest->header.dataPropertyFlags & SEANIM_PRECISION_HIGH)
 				{
-					vec3_t res;
-					SELIB_FREAD(res, sizeof(double), 3, handle);
-					memcpy(dest->boneData[i].loc[o].loc, res, 3 * sizeof(double));
+					SELIB_FREAD(dest->boneData[i].loc[o].loc, sizeof(vec3_t), 1, handle);
 				}
 				else {
 					float in[3];
@@ -158,10 +157,10 @@ int SELIB_API LoadSEAnim(SEAnim_File_t *dest, SELIB_FS_HANDLE handle)
 				dest->boneData[i].rotKeyCount = (uint32_t)v32;
 				break;
 			default:
-				SEANIM_ASSERT(0); // should never ever happen.... ever
+				SELIB_ASSERT(0); // should never ever happen.... ever
 				break;
 			}
-			dest->boneData[i].quats = (SEAnim_BoneRotData_t*)SEANIM_CALLOC(dest->boneData[i].rotKeyCount, sizeof(SEAnim_BoneRotData_t));
+			dest->boneData[i].quats = (SEAnim_BoneRotData_t*)SELIB_CALLOC(dest->boneData[i].rotKeyCount, sizeof(SEAnim_BoneRotData_t));
 			for (uint32_t o = 0; o < dest->boneData[i].rotKeyCount; o++)
 			{
 				switch (numSize)
@@ -179,14 +178,12 @@ int SELIB_API LoadSEAnim(SEAnim_File_t *dest, SELIB_FS_HANDLE handle)
 					dest->boneData[i].quats[o].frame = (uint32_t)v32;
 					break;
 				default:
-					SEANIM_ASSERT(0); // should never ever happen.... ever
+					SELIB_ASSERT(0); // should never ever happen.... ever
 					break;
 				}
 				if (dest->header.dataPropertyFlags & SEANIM_PRECISION_HIGH)
 				{
-					quat_t res;
-					SELIB_FREAD(res, sizeof(double), 4, handle);
-					memcpy(dest->boneData[i].quats[o].rot, res, 4 * sizeof(double));
+					SELIB_FREAD(dest->boneData[i].quats[o].rot, sizeof(quat_t), 1, handle);
 				}
 				else {
 					float in[4];
@@ -221,10 +218,10 @@ int SELIB_API LoadSEAnim(SEAnim_File_t *dest, SELIB_FS_HANDLE handle)
 				dest->boneData[i].scaleKeyCount = (uint32_t)v32;
 				break;
 			default:
-				SEANIM_ASSERT(0); // should never ever happen.... ever
+				SELIB_ASSERT(0); // should never ever happen.... ever
 				break;
 			}
-			dest->boneData[i].scale = (SEAnim_BoneScaleData_t*)SEANIM_CALLOC(dest->boneData[i].scaleKeyCount, sizeof(SEAnim_BoneScaleData_t));
+			dest->boneData[i].scale = (SEAnim_BoneScaleData_t*)SELIB_CALLOC(dest->boneData[i].scaleKeyCount, sizeof(SEAnim_BoneScaleData_t));
 			for (uint32_t o = 0; o < dest->boneData[i].scaleKeyCount; o++)
 			{
 				switch (numSize)
@@ -242,14 +239,12 @@ int SELIB_API LoadSEAnim(SEAnim_File_t *dest, SELIB_FS_HANDLE handle)
 					dest->boneData[i].scale[o].frame = (uint32_t)v32;
 					break;
 				default:
-					SEANIM_ASSERT(0); // should never ever happen.... ever
+					SELIB_ASSERT(0); // should never ever happen.... ever
 					break;
 				}
 				if (dest->header.dataPropertyFlags & SEANIM_PRECISION_HIGH)
 				{
-					vec3_t res;
-					SELIB_FREAD(res, sizeof(double), 3, handle);
-					memcpy(dest->boneData[i].scale[o].scale, res, 3 * sizeof(double));
+					SELIB_FREAD(dest->boneData[i].scale[o].scale, sizeof(vec3_t), 1, handle);
 				}
 				else {
 					float in[3];
@@ -268,7 +263,7 @@ int SELIB_API LoadSEAnim(SEAnim_File_t *dest, SELIB_FS_HANDLE handle)
 
 	if (dest->header.dataPresenceFlags & SEANIM_PRESENCE_NOTE)
 	{
-		dest->notes = (SEAnim_Note_t*)SEANIM_CALLOC(dest->header.noteCount, sizeof(SEAnim_Note_t));
+		dest->notes = (SEAnim_Note_t*)SELIB_CALLOC(dest->header.noteCount, sizeof(SEAnim_Note_t));
 		dest->noteCount = dest->header.noteCount;
 		for (uint32_t i = 0; i < dest->header.noteCount; i++)
 		{
@@ -290,16 +285,18 @@ int SELIB_API LoadSEAnim(SEAnim_File_t *dest, SELIB_FS_HANDLE handle)
 				dest->notes[i].frame = (uint32_t)v32;
 				break;
 			default:
-				SEANIM_ASSERT(0); // should never ever happen.... ever
+				SELIB_ASSERT(0); // should never ever happen.... ever
 				break;
 			}
-			memset(dest->notes[i].name, 0xcc, 64);
+			dest->notes[i].name = (uint8_t*)SELIB_CALLOC(1, sizeof(uint8_t));
+			dest->notes[i].name[0] = 0xcc;
 			int stri = 0;
 			char started = 0;
-			while (dest->notes[i].name[stri] != 0)
+			while (dest->notes[i].name[stri] != 0 )
 			{
 				if (started) stri++;
 				else started = 1;
+				dest->notes[i].name = SELIB_REALLOC(dest->notes[i].name, stri + 1);
 				SELIB_FREAD(&dest->notes[i].name[stri], 1, 1, handle);
 			}
 			SELib_Printf("Note %u (f: %u): %s\n", i, dest->notes[i].frame, dest->notes[i].name);
@@ -309,7 +306,7 @@ int SELIB_API LoadSEAnim(SEAnim_File_t *dest, SELIB_FS_HANDLE handle)
 	if (dest->header.dataPresenceFlags & SEANIM_PRESENCE_CUSTOM)
 	{
 		SELIB_FREAD(&dest->customDataBlockSize, 4, 1, handle);
-		dest->customDataBlockBuf = (uint8_t *)SEANIM_CALLOC(dest->customDataBlockSize, 1);
+		dest->customDataBlockBuf = (uint8_t *)SELIB_CALLOC(dest->customDataBlockSize, 1);
 		SELIB_FREAD(dest->customDataBlockBuf, 1, dest->customDataBlockSize, handle);
 	}
 	dest->isLoaded = 1;

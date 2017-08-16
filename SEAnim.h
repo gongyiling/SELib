@@ -128,7 +128,7 @@ extern "C"
 	typedef struct SEAnim_Note_s
 	{
 		uint32_t frame;
-		char name[64];
+		char *name;
 	} SEAnim_Note_t;
 
 	typedef struct SEAnim_BoneData_s

@@ -145,14 +145,14 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\SEAnim.h" />
-    <ClInclude Include="..\SEAnim_config.h" />
-    <ClInclude Include="..\SELib.h" />
+    <ClInclude Include="..\..\SEAnim.h" />
+    <ClInclude Include="..\..\SELib.h" />
+    <ClInclude Include="..\..\SELib_config.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\SEAnim.c" />
+    <ClCompile Include="..\..\SEAnim.c" />
     <ClCompile Include="SEAnimInfo.cpp" />
     <ClCompile Include="stdafx.cpp" />
   </ItemGroup>
