@@ -41,6 +41,16 @@ int main(int argc, char *argv[])
 	printf("Bone Count: %u\n", seanim.header.boneCount);
 	printf("Bone Anim Modifier Count: %u\n", seanim.header.boneAnimModifierCount);
 	printf("Note Count: %u\n", seanim.header.noteCount);
+	printf("----------------------\n");
+	for (unsigned int i = 0; i < seanim.header.boneCount; i++)
+	{
+		printf("Bone %u: %s %s\n", i, seanim.bone[i], seanim.boneData[i].flags & SEANIM_BONE_COSMETIC ? "(cosmetic)" : "");
+	}
+	printf("----------------------\n");
+	for (unsigned int i = 0; i < seanim.header.noteCount; i++)
+	{
+		printf("Note %u: %s\n", i, seanim.notes[i].name);
+	}
 	FreeSEAnim(&seanim);
     return 0;
 }
