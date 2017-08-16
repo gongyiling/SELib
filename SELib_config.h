@@ -13,7 +13,7 @@
 // SEAnim config
 
 // Don't use high precision (eg. if using SEAnims on low-memory devices)
-#define DONT_USE_HIGH_PRECISION
+//#define DONT_USE_HIGH_PRECISION
 
 
 // Define attributes of all API symbols declarations, e.g. for DLL under Windows.
