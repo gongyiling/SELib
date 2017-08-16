@@ -58,6 +58,16 @@ extern "C"
 
 #define SELIB_LIB_VERSION		"1.0"
 
+#ifndef DONT_USE_HIGH_PRECISION
+	typedef double vec3_t[3];
+	typedef double quat_t[4]; // X Y Z W (Normalized)
+#else
+	typedef float vec3_t[3];
+	typedef float quat_t[4]; // X Y Z W (Normalized)
+#endif
+
+#include "SELib_internal.h"
+
 #include "SEAnim.h"
 
 #ifdef __cplusplus

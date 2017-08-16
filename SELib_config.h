@@ -1,6 +1,21 @@
 #ifndef __SELIB_CONFIG_H
 #define __SELIB_CONFIG_H
 
+// General config
+
+// Enable debug prints (uses printf)
+//#define SELIB_DEBUG_PRINT
+
+// Define custom printf function
+//#define SELIB_PRINTF_FUNC printf
+
+
+// SEAnim config
+
+// Don't use high precision (eg. if using SEAnims on low-memory devices)
+#define DONT_USE_HIGH_PRECISION
+
+
 // Define attributes of all API symbols declarations, e.g. for DLL under Windows.
 //#define SEANIM_API __declspec( dllexport )
 //#define SEANIM_API __declspec( dllimport )

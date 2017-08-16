@@ -36,9 +36,6 @@ extern "C"
 #define SEANIM_SPEC_VERSION		"1.0.1"
 #define SEANIM_LIB_VERSION		"1.0"
 
-	typedef double vec3_t[3];
-	typedef double quat_t[4]; // X Y Z W (Normalized)
-
 	// Specifies how the data is interpreted by the importer
 	enum SEAnim_AnimationType
 	{

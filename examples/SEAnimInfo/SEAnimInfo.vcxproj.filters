@@ -36,6 +36,9 @@
     <ClInclude Include="..\..\SELib_config.h">
       <Filter>SEAnim</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\SELib_internal.h">
+      <Filter>SEAnim</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -45,6 +48,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\SEAnim.c">
+      <Filter>SEAnim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SELib_internal.c">
       <Filter>SEAnim</Filter>
     </ClCompile>
   </ItemGroup>

@@ -15,19 +15,21 @@ int main(int argc, char *argv[])
 		printf("Drag and drop a SEAnim on the exe to print info\n");
 		return 0;
 	}
-	startClock = clock();
+	
 	SEAnim_File_t seanim;
 	memset(&seanim, 0, sizeof(SEAnim_File_t));
 	FILE* f;
 	fopen_s(&f, argv[1], "rb");
+	startClock = clock();
 	int r = LoadSEAnim(&seanim, f);
+	endClock = clock();
 	fclose(f);
 	if (r != 0)
 	{
 		printf("Error: %d\n", r);
 		return 1;
 	}
-	endClock = clock();
+
 	float operationTime = (endClock - startClock) / (float)CLOCKS_PER_SEC;
 	printf("SEAnim processed in %f seconds\n", operationTime);
 	printf("----------------------\n");
@@ -41,15 +43,15 @@ int main(int argc, char *argv[])
 	printf("Bone Count: %u\n", seanim.header.boneCount);
 	printf("Bone Anim Modifier Count: %u\n", seanim.header.boneAnimModifierCount);
 	printf("Note Count: %u\n", seanim.header.noteCount);
-	printf("----------------------\n");
+	//printf("----------------------\n");
 	for (unsigned int i = 0; i < seanim.header.boneCount; i++)
 	{
-		printf("Bone %u: %s %s\n", i, seanim.bone[i], seanim.boneData[i].flags & SEANIM_BONE_COSMETIC ? "(cosmetic)" : "");
+		//printf("Bone %u: %s %s\n", i, seanim.bone[i], seanim.boneData[i].flags & SEANIM_BONE_COSMETIC ? "(cosmetic)" : "");
 	}
-	printf("----------------------\n");
+	//printf("----------------------\n");
 	for (unsigned int i = 0; i < seanim.header.noteCount; i++)
 	{
-		printf("Note %u: %s\n", i, seanim.notes[i].name);
+		//printf("Note %u: %s\n", i, seanim.notes[i].name);
 	}
 	FreeSEAnim(&seanim);
     return 0;
