@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
 	SaveSEAnim(&seanim, fs);
 	fclose(fs);
 	endClock = clock();
-	float operationTime = (endClock - startClock) / (float)CLOCKS_PER_SEC;
+	operationTime = (endClock - startClock) / (float)CLOCKS_PER_SEC;
 	printf("SEAnim saved in %f seconds\n", operationTime);
 	FreeSEAnim(&seanim);
     return 0;

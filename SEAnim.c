@@ -129,7 +129,7 @@ int SELIB_API SaveSEAnim(SEAnim_File_t * src, SELIB_FS_HANDLE handle)
 			for (uint32_t o = 0; o < src->boneData[i].locKeyCount; o++)
 			{
 				__SELib_internal_WriteVariableLengthNumber(numSize, &src->boneData[i].loc[o].frame, handle); // write frame index
-				__SELib_internal_WriteVector3FromFile(src->header.dataPropertyFlags, &src->boneData[i].loc[o].loc, handle); // write keyframe data
+				__SELib_internal_WriteVector3ToFile(src->header.dataPropertyFlags, &src->boneData[i].loc[o].loc, handle); // write keyframe data
 			}
 		}
 		if (src->header.dataPresenceFlags & SEANIM_BONE_ROT)		// does animation has bone rotation data?
@@ -138,7 +138,7 @@ int SELIB_API SaveSEAnim(SEAnim_File_t * src, SELIB_FS_HANDLE handle)
 			for (uint32_t o = 0; o < src->boneData[i].rotKeyCount; o++)
 			{
 				__SELib_internal_WriteVariableLengthNumber(numSize, &src->boneData[i].quats[o].frame, handle); // write frame index
-				__SELib_internal_WriteQuatFromFile(src->header.dataPropertyFlags, &src->boneData[i].quats[o].rot, handle); // write keyframe data
+				__SELib_internal_WriteQuatToFile(src->header.dataPropertyFlags, &src->boneData[i].quats[o].rot, handle); // write keyframe data
 			}
 		}
 		if (src->header.dataPresenceFlags & SEANIM_BONE_SCALE)		// does animation has bone scale data?
@@ -147,7 +147,7 @@ int SELIB_API SaveSEAnim(SEAnim_File_t * src, SELIB_FS_HANDLE handle)
 			for (uint32_t o = 0; o < src->boneData[i].scaleKeyCount; o++)
 			{
 				__SELib_internal_WriteVariableLengthNumber(numSize, &src->boneData[i].scale[o].frame, handle); // write frame index
-				__SELib_internal_WriteVector3FromFile(src->header.dataPropertyFlags, &src->boneData[i].scale[o].scale, handle); // write keyframe data
+				__SELib_internal_WriteVector3ToFile(src->header.dataPropertyFlags, &src->boneData[i].scale[o].scale, handle); // write keyframe data
 			}
 		}
 	}
