@@ -16,10 +16,10 @@ No specific build process is required to compile SELib. You can compile/include 
 ### What's working
 
  - SEAnim loading
+ - SEAnim saving
 
 ### What's not working
 
- - SEAnim saving
  - SEModel loading/saving (waiting for specification document)
 
 ## Examples
