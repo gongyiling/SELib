@@ -108,3 +108,97 @@ inline void __SELib_internal_ReadQuatFromFile(uint8_t animationFlags, quat_t * d
 	}
 #endif
 }
+
+inline void __SELib_internal_WriteVariableLengthNumber(int numberLength, uint32_t * source, SELIB_FS_HANDLE handle)
+{
+	static uint8_t v8 = 0;
+	static uint16_t v16 = 0;
+	switch (numberLength)
+	{
+	case 1:
+		v8 = *source;
+		SELIB_FWRITE(&v8, 1, 1, handle);
+		break;
+	case 2:
+		v16 = *source;
+		SELIB_FWRITE(&v16, 2, 1, handle);
+		break;
+	case 4:
+		SELIB_FWRITE(source, 4, 1, handle);
+		break;
+	default:
+		SELIB_ASSERT(0); // Wrong number size, it's important to fix it if you encounter that
+		break;
+	}
+}
+
+inline void __SELib_internal_WriteNullTerminatedString(uint8_t ** source, SELIB_FS_HANDLE handle)
+{
+	for (int i = 0;; i++)
+	{
+		SELIB_FWRITE(&(*source)[i], 1, 1, handle);
+		if ((*source)[i] == 0) break;
+	}
+}
+
+inline void __SELib_internal_WriteVector3ToFile(uint8_t animationFlags, vec3_t * source, SELIB_FS_HANDLE handle)
+{
+#ifndef DONT_USE_HIGH_PRECISION
+	if (animationFlags & SEANIM_PRECISION_HIGH)
+	{
+		SELIB_FWRITE(source, sizeof(vec3_t), 1, handle);
+	}
+	else {
+		float out[3];
+		for (int i = 0; i < 3; i++)
+		{
+			out[i] = (*source)[i];
+		}
+		SELIB_FWRITE(out, sizeof(float), 3, handle);
+	}
+#else
+	if (animationFlags & SEANIM_PRECISION_HIGH)
+	{
+		double out[3];
+		for (int i = 0; i < 3; i++)
+		{
+			out[i] = (*source)[i];
+		}
+		SELIB_FWRITE(out, sizeof(double), 3, handle);
+	}
+	else {
+		SELIB_FWRITE(source, sizeof(vec3_t), 1, handle);
+	}
+#endif
+}
+
+inline void __SELib_internal_WriteQuatToFile(uint8_t animationFlags, quat_t * source, SELIB_FS_HANDLE handle)
+{
+#ifndef DONT_USE_HIGH_PRECISION
+	if (animationFlags & SEANIM_PRECISION_HIGH)
+	{
+		SELIB_FWRITE(source, sizeof(quat_t), 1, handle);
+	}
+	else {
+		float out[4];
+		for (int i = 0; i < 4; i++)
+		{
+			out[i] = (*source)[i];
+		}
+		SELIB_FWRITE(out, sizeof(float), 4, handle);
+	}
+#else
+	if (animationFlags & SEANIM_PRECISION_HIGH)
+	{
+		double out[4];
+		for (int i = 0; i < 4; i++)
+		{
+			out[i] = (*source)[i];
+		}
+		SELIB_FWRITE(out, sizeof(double), 4, handle);
+	}
+	else {
+		SELIB_FWRITE(source, sizeof(quat_t), 1, handle);
+	}
+#endif
+}

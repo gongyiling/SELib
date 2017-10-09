@@ -98,9 +98,75 @@ int SELIB_API LoadSEAnim(SEAnim_File_t *dest, SELIB_FS_HANDLE handle)
 	return SEANIM_OK;
 }
 
-int SELIB_API SaveSEAnim(SEAnim_File_t * src, SELIB_FS_HANDLE destHandle)
+int SELIB_API SaveSEAnim(SEAnim_File_t * src, SELIB_FS_HANDLE handle)
 {
-	// TODO
+	SELIB_FWRITE(SEANIM_MAGIC, 1, 6, handle); // write magic, it's always 6 bytes
+
+	const uint16_t seanimVer = SEANIM_VERSION;
+	SELIB_FWRITE(&seanimVer, 2, 1, handle); // write version
+
+	SELIB_FWRITE(&src->header, sizeof(SEAnim_Header_t), 1, handle); // write header
+
+	for (uint32_t i = 0; i < src->header.boneCount; i++)
+	{
+		__SELib_internal_WriteNullTerminatedString(&src->bone[i], handle); // write bone name
+	}
+
+	int numSize = (src->header.boneCount <= 0xFF ? 1 : (src->header.boneCount <= 0xFFFF ? 2 : 4)); // determine bone index length in bytes depending on bone count
+	for (uint8_t i = 0; i < src->header.boneAnimModifierCount; i++)
+	{
+		__SELib_internal_WriteVariableLengthNumber(numSize, &src->boneModifiers[i].index, handle);	// write the bone index for bone modifier
+		SELIB_FWRITE(&src->boneModifiers[i].animTypeOverride, 1, 1, handle);						// write the anim type override for bone modifier
+	}
+
+	numSize = (src->header.frameCount <= 0xFF ? 1 : (src->header.frameCount <= 0xFFFF ? 2 : 4)); // determine frame index length in bytes depending on frame count
+	for (uint32_t i = 0; i < src->header.boneCount; i++)
+	{
+		SELIB_FWRITE(&src->boneData[i].flags, 1, 1, handle);		// write flags for bone
+		if (src->header.dataPresenceFlags & SEANIM_BONE_LOC)		// does animation has bone position data?
+		{
+			__SELib_internal_WriteVariableLengthNumber(numSize, &src->boneData[i].locKeyCount, handle);		// write the count for bone position keyframes
+			for (uint32_t o = 0; o < src->boneData[i].locKeyCount; o++)
+			{
+				__SELib_internal_WriteVariableLengthNumber(numSize, &src->boneData[i].loc[o].frame, handle); // write frame index
+				__SELib_internal_WriteVector3FromFile(src->header.dataPropertyFlags, &src->boneData[i].loc[o].loc, handle); // write keyframe data
+			}
+		}
+		if (src->header.dataPresenceFlags & SEANIM_BONE_ROT)		// does animation has bone rotation data?
+		{
+			__SELib_internal_WriteVariableLengthNumber(numSize, &src->boneData[i].rotKeyCount, handle);		// write the count for bone rotation keyframes
+			for (uint32_t o = 0; o < src->boneData[i].rotKeyCount; o++)
+			{
+				__SELib_internal_WriteVariableLengthNumber(numSize, &src->boneData[i].quats[o].frame, handle); // write frame index
+				__SELib_internal_WriteQuatFromFile(src->header.dataPropertyFlags, &src->boneData[i].quats[o].rot, handle); // write keyframe data
+			}
+		}
+		if (src->header.dataPresenceFlags & SEANIM_BONE_SCALE)		// does animation has bone scale data?
+		{
+			__SELib_internal_WriteVariableLengthNumber(numSize, &src->boneData[i].scaleKeyCount, handle);		// write the count for bone scale keyframes
+			for (uint32_t o = 0; o < src->boneData[i].scaleKeyCount; o++)
+			{
+				__SELib_internal_WriteVariableLengthNumber(numSize, &src->boneData[i].scale[o].frame, handle); // write frame index
+				__SELib_internal_WriteVector3FromFile(src->header.dataPropertyFlags, &src->boneData[i].scale[o].scale, handle); // write keyframe data
+			}
+		}
+	}
+
+	if (src->header.dataPresenceFlags & SEANIM_PRESENCE_NOTE)		// does animation has notetracks?
+	{
+		src->noteCount = src->header.noteCount;
+		for (uint32_t i = 0; i < src->header.noteCount; i++)
+		{
+			__SELib_internal_WriteVariableLengthNumber(numSize, &src->notes[i].frame, handle);	// write frame index
+			__SELib_internal_WriteNullTerminatedString(&src->notes[i].name, handle);			// write note name
+		}
+	}
+
+	if (src->header.dataPresenceFlags & SEANIM_PRESENCE_CUSTOM)	// does animation has a custom data block?
+	{
+		SELIB_FWRITE(&src->customDataBlockSize, 4, 1, handle);		// write data block size
+		SELIB_FWRITE(src->customDataBlockBuf, 1, src->customDataBlockSize, handle); // write the custom data block
+	}
 	return 0;
 }
 
