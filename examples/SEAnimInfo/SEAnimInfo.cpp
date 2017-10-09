@@ -57,6 +57,11 @@ int main(int argc, char *argv[])
 	startClock = clock();
 	FILE *fs;
 	fopen_s(&fs, "test_copy.seanim", "wb");
+	static char *customdata = "Saved with SEAnimInfo";
+	seanim.header.dataPresenceFlags |= SEANIM_PRESENCE_CUSTOM;
+	seanim.customDataBlockBuf = new uint8_t[23];
+	memcpy(seanim.customDataBlockBuf, customdata, 23);
+	seanim.customDataBlockSize = 23;
 	SaveSEAnim(&seanim, fs);
 	fclose(fs);
 	endClock = clock();
