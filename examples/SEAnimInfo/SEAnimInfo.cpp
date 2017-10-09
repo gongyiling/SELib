@@ -53,6 +53,15 @@ int main(int argc, char *argv[])
 	{
 		//printf("Note %u: %s\n", i, seanim.notes[i].name);
 	}
+
+	startClock = clock();
+	FILE *fs;
+	fopen_s(&fs, "test_copy.seanim", "wb");
+	SaveSEAnim(&seanim, fs);
+	fclose(fs);
+	endClock = clock();
+	float operationTime = (endClock - startClock) / (float)CLOCKS_PER_SEC;
+	printf("SEAnim saved in %f seconds\n", operationTime);
 	FreeSEAnim(&seanim);
     return 0;
 }
