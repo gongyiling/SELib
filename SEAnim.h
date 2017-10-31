@@ -33,7 +33,7 @@ extern "C"
 
 #define SEANIM_VERSION			1
 #define SEANIM_MAGIC			"SEAnim"
-#define SEANIM_SPEC_VERSION		"1.0.1"
+#define SEANIM_SPEC_VERSION		"1.1.0"
 #define SEANIM_LIB_VERSION		"1.0"
 
 	// Specifies how the data is interpreted by the importer
