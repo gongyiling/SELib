@@ -7,6 +7,8 @@ SELib is self-contained within a few files that you can easily copy and compile 
  - SELib.h
  - SEAnim.h
  - SEAnim.c
+ - SEModel.h
+ - SEModel.c
  - SELib_internal.h
  - SELib_internal.c
  - SELib_config.h (empty by default, editable by user)
