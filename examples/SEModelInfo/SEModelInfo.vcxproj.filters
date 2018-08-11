@@ -7,18 +7,15 @@
     </Filter>
     <Filter Include="Header Files">
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
     <Filter Include="SELib">
-      <UniqueIdentifier>{a368b12a-9955-454b-9531-70baf625cfac}</UniqueIdentifier>
+      <UniqueIdentifier>{7f44bba3-b149-4845-9087-3a033bf7500c}</UniqueIdentifier>
     </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -39,18 +36,24 @@
     <ClInclude Include="..\..\SELib_internal.h">
       <Filter>SELib</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\SEModel.h">
+      <Filter>SELib</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SEAnimInfo.cpp">
+    <ClCompile Include="SEModelInfo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\SEAnim.c">
       <Filter>SELib</Filter>
     </ClCompile>
     <ClCompile Include="..\..\SELib_internal.c">
+      <Filter>SELib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SEModel.c">
       <Filter>SELib</Filter>
     </ClCompile>
   </ItemGroup>

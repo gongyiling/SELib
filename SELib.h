@@ -56,19 +56,36 @@ extern "C"
 #define SELIB_FREAD(ptr, elementSize, elementCount, fileHandle) fread(ptr, elementSize, elementCount, fileHandle)
 #endif
 
-#define SELIB_LIB_VERSION		"1.0"
+#define SELIB_LIB_VERSION		"2.0"
 
 #ifndef DONT_USE_HIGH_PRECISION
+	typedef double vec2_t[2];
 	typedef double vec3_t[3];
 	typedef double quat_t[4]; // X Y Z W (Normalized)
 #else
+	typedef float vec2_t[2];
 	typedef float vec3_t[3];
 	typedef float quat_t[4]; // X Y Z W (Normalized)
 #endif
 
+//#ifndef DONT_USE_HIGH_PRECISION
+	typedef double vec2d_t[2];
+	typedef double vec3d_t[3];
+	typedef double quatd_t[4]; // X Y Z W (Normalized)
+//#else
+	typedef float vec2f_t[2];
+	typedef float vec3f_t[3];
+	typedef float quatf_t[4]; // X Y Z W (Normalized)
+//#endif
+
+	typedef uint8_t vec2b_t[2];
+	typedef uint8_t vec3b_t[3];
+	typedef uint8_t quatb_t[4];
+
 #include "SELib_internal.h"
 
 #include "SEAnim.h"
+#include "SEModel.h"
 
 #ifdef __cplusplus
 }

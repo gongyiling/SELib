@@ -194,8 +194,6 @@ extern "C"
 		uint16_t version;	// The file version - the current version is 0x1
 		SEAnim_Header_t header;
 
-		uint8_t			isLoaded;
-
 		uint8_t						**bone;
 		SEAnim_BoneAnimModifier_t	*boneModifiers;
 		SEAnim_BoneData_t			*boneData;

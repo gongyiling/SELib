@@ -4,12 +4,10 @@
 int SELIB_API LoadSEAnim(SEAnim_File_t *dest, SELIB_FS_HANDLE handle)
 {
 	memset(dest, 0, sizeof(SEAnim_File_t));
-	dest->isLoaded = 0;
 
-	char magicToCompare[] = SEANIM_MAGIC;
-	SELIB_FREAD(dest->magic, 1, 6, handle); // read magic, it's always 6 bytes
+	SELIB_FREAD(dest->magic, 1, sizeof(SEANIM_MAGIC) - 1, handle); // read magic
 
-	if (strncmp(dest->magic, magicToCompare, 6) != 0)
+	if (strncmp(dest->magic, SEANIM_MAGIC, sizeof(SEANIM_MAGIC) - 1) != 0)
 		return SEANIM_WRONG_MAGIC;
 
 	SELIB_FREAD(&dest->version, 2, 1, handle); // read version
@@ -94,7 +92,6 @@ int SELIB_API LoadSEAnim(SEAnim_File_t *dest, SELIB_FS_HANDLE handle)
 		dest->customDataBlockBuf = (uint8_t *)SELIB_CALLOC(dest->customDataBlockSize, 1); // allocate the memory for the data block
 		SELIB_FREAD(dest->customDataBlockBuf, 1, dest->customDataBlockSize, handle); // read the custom data block
 	}
-	dest->isLoaded = 1;
 	return SEANIM_OK;
 }
 
