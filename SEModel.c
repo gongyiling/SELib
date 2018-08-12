@@ -48,7 +48,7 @@ int SELIB_API LoadSEModel(SEModel_File_t * dest, SELIB_FS_HANDLE handle)
 			}
 		}
 	}
-	int ft = ftell(handle);
+
 	if (dest->header.dataPresenceFlags & SEMODEL_PRESENCE_MESH)
 	{
 		dest->meshData = (SEModel_MeshData_t *)SELIB_CALLOC(dest->header.meshCount, sizeof(SEModel_MeshData_t));
