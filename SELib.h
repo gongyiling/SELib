@@ -46,7 +46,9 @@ extern "C"
 ////////////////////////
 // Filesystem defines //
 ////////////////////////
+#ifndef SELIB_FS_HANDLE 
 #define SELIB_FS_HANDLE FILE*
+#endif
 
 #ifndef SELIB_FWRITE
 #define SELIB_FWRITE(ptr, elementSize, elementCount, fileHandle) fwrite(ptr, elementSize, elementCount, fileHandle)
