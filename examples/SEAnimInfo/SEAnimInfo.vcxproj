@@ -151,6 +151,11 @@
     <ClInclude Include="..\..\SELib.h" />
     <ClInclude Include="..\..\SELib_config.h" />
     <ClInclude Include="..\..\SELib_internal.h" />
+    <ClInclude Include="Px.h" />
+    <ClInclude Include="PxMath.h" />
+    <ClInclude Include="PxQuat.h" />
+    <ClInclude Include="PxTransform.h" />
+    <ClInclude Include="PxVec3.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>

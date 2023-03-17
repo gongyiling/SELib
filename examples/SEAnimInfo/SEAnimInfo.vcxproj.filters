@@ -39,6 +39,21 @@
     <ClInclude Include="..\..\SELib_internal.h">
       <Filter>SELib</Filter>
     </ClInclude>
+    <ClInclude Include="PxQuat.h">
+      <Filter>SELib</Filter>
+    </ClInclude>
+    <ClInclude Include="PxVec3.h">
+      <Filter>SELib</Filter>
+    </ClInclude>
+    <ClInclude Include="PxTransform.h">
+      <Filter>SELib</Filter>
+    </ClInclude>
+    <ClInclude Include="PxMath.h">
+      <Filter>SELib</Filter>
+    </ClInclude>
+    <ClInclude Include="Px.h">
+      <Filter>SELib</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
