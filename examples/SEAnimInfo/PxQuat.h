@@ -394,6 +394,114 @@ class PxQuat
 	float x, y, z, w;
 };
 
+PxQuat slerp(const float t, const PxQuat& left, const PxQuat& right)
+{
+	const float quatEpsilon = (float(1.0e-8f));
+
+	float cosine = left.dot(right);
+	float sign = float(1);
+	if (cosine < 0)
+	{
+		cosine = -cosine;
+		sign = float(-1);
+	}
+
+	float sine = float(1) - cosine * cosine;
+
+	if (sine >= quatEpsilon * quatEpsilon)
+	{
+		sine = PxSqrt(sine);
+		const float angle = PxAtan2(sine, cosine);
+		const float i_sin_angle = float(1) / sine;
+
+		const float leftw = PxSin(angle * (float(1) - t)) * i_sin_angle;
+		const float rightw = PxSin(angle * t) * i_sin_angle * sign;
+
+		return left * leftw + right * rightw;
+	}
+
+	return left;
+}
+
+PxQuat from_rotator(float pitch, float yaw, float roll)
+{
+	const float DEG_TO_RAD = PxPi / (180.f);
+	const float RADS_DIVIDED_BY_2 = DEG_TO_RAD / 2.f;
+	float SP, SY, SR;
+	float CP, CY, CR;
+
+	const float PitchNoWinding = pitch;
+	const float YawNoWinding = yaw;
+	const float RollNoWinding = roll;
+
+	sincos(PitchNoWinding * RADS_DIVIDED_BY_2 , SP, CP);
+	sincos(YawNoWinding * RADS_DIVIDED_BY_2 , SY, CY);
+	sincos(RollNoWinding * RADS_DIVIDED_BY_2 , SR, CR);
+
+	PxQuat RotationQuat;
+	RotationQuat.x = CR * SP * SY - SR * CP * CY;
+	RotationQuat.y = -CR * SP * CY - SR * CP * SY;
+	RotationQuat.z = CR * CP * SY - SR * SP * CY;
+	RotationQuat.w = CR * CP * CY + SR * SP * SY;
+	return RotationQuat;
+}
+
+PxQuat from_rotator(const PxVec3& rotator)
+{
+	// pitch = y
+	// yaw = z
+	// roll = x
+	return from_rotator(rotator.y, rotator.z, rotator.x);
+}
+
+float sqr(float x)
+{
+	return x * x;
+}
+
+float NormalizeAxis(float x)
+{
+	return x;
+}
+
+PxVec3 to_rotator(const PxQuat& q)
+{
+	const float SingularityTest = q.z * q.x - q.w * q.y;
+	const float YawY = 2.f * (q.w * q.z + q.x * q.y);
+	const float YawX = (1.f - 2.f * (sqr(q.y) + sqr(q.z)));
+
+	// reference 
+	// http://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
+	// http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToEuler/
+
+	// this value was found from experience, the above websites recommend different values
+	// but that isn't the case for us, so I went through different testing, and finally found the case 
+	// where both of world lives happily. 
+	const float SINGULARITY_THRESHOLD = 0.4999995f;
+	const float RAD_TO_DEG = (180.f) / PxPi;
+	float Pitch, Yaw, Roll;
+	if (SingularityTest < -SINGULARITY_THRESHOLD)
+	{
+		Pitch = -90.f;
+		Yaw = PxAtan2(YawY, YawX) * RAD_TO_DEG;
+		Roll = NormalizeAxis(-Yaw - (2.f * PxAtan2(q.x, q.w) * RAD_TO_DEG));
+	}
+	else if (SingularityTest > SINGULARITY_THRESHOLD)
+	{
+		Pitch = 90.f;
+		Yaw = PxAtan2(YawY, YawX) * RAD_TO_DEG;
+		Roll = NormalizeAxis(Yaw - (2.f * PxAtan2(q.x, q.w) * RAD_TO_DEG));
+	}
+	else
+	{
+		Pitch = PxAsin(2.f * (SingularityTest)) * RAD_TO_DEG;
+		Yaw = PxAtan2(YawY, YawX) * RAD_TO_DEG;
+		Roll = PxAtan2(-2.f * (q.w * q.x + q.y * q.z), (1.f - 2.f * (sqr(q.x) +sqr(q.y)))) * RAD_TO_DEG;
+	}
+	return PxVec3(Roll, Pitch, Yaw);
+}
+
+
 #if !PX_DOXYGEN
 } // namespace physx
 #endif

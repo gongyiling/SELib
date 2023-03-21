@@ -6,6 +6,10 @@
 #include <filesystem>
 #include <vector>
 #include <unordered_map>
+#include "PxTransform.h"
+
+using namespace physx;
+
 time_t startClock = 0;
 time_t endClock = 0;
 
@@ -112,185 +116,263 @@ void matching(const char* dir)
 	}
 }
 
-struct PxQuat
-{
-
-	double x, y, z, w;
-};
-
-
-struct tranform
-{
-	vec3_t pos;
-	quat_t rot;
-
-	static const tranform identity;
-};
-
-
-void mul(quat_t& p, const quat_t& q)
-{
-	const float tx = w * q.x + q.w * x + y * q.z - q.y * z;
-	const float ty = w * q.y + q.w * y + z * q.x - q.z * x;
-	const float tz = w * q.z + q.w * z + x * q.y - q.x * y;
-
-	w = w * q.w - q.x * x - y * q.y - q.z * z;
-	x = tx;
-	y = ty;
-	z = tz;
-}
-
-const vec3_t rotate(const quat_t& quat, const vec3_t& v)
-{
-	const float vx = 2.0f * v.x;
-	const float vy = 2.0f * v.y;
-	const float vz = 2.0f * v.z;
-	const float w2 = w * w - 0.5f;
-	const float dot2 = (x * vx + y * vy + z * vz);
-	return PxVec3((vx * w2 + (y * vz - z * vy) * w + x * dot2), (vy * w2 + (z * vx - x * vz) * w + y * dot2),
-		(vz * w2 + (x * vy - y * vx) * w + z * dot2));
-}
-
-const tranform tranform::identity = { {0, 0, 0}, {0, 0, 0, 1} };
-
-
 struct bone
 {
 	const char* bone_name;
 	int parent_index;
+	PxTransform ref_transform;
 };
 
-void print_pose_info(const char* dir)
+PxQuat mq(float pitch, float yaw, float roll)
 {
-	std::vector<accinfo> accinfos;
+	return from_rotator(pitch, yaw, roll);
+}
+
+template< class T, class U >
+static T Lerp(const U& Alpha, const T& A, const T& B)
+{
+	return (T)(A + Alpha * (B - A));
+}
+
+static void lerp_transform(PxTransform* transforms, int frame_count, int start_frame, int end_frame, bool lerp_loc)
+{
+	if (start_frame == -1 && frame_count == end_frame)
+	{
+		return;
+	}
+	if (start_frame == -1)
+	{
+		for (int i = 0; i < end_frame; i++)
+		{
+			if (lerp_loc)
+			{
+				transforms[i].p = transforms[end_frame].p;
+			}
+			else
+			{
+				transforms[i].q = transforms[end_frame].q;
+			}
+		}
+	}
+	else if (end_frame == frame_count)
+	{
+		for (int i = start_frame + 1; i < end_frame; i++)
+		{
+			if (lerp_loc)
+			{
+				transforms[i].p = transforms[start_frame].p;
+			}
+			else
+			{
+				transforms[i].q = transforms[start_frame].q;
+			}
+		}
+	}
+	else
+	{
+		float inv = 1.0f / (end_frame - start_frame);
+		for (int i = start_frame + 1; i < end_frame; i++)
+		{
+			float t = i * inv;
+			if (lerp_loc)
+			{
+				transforms[i].p = Lerp(t, transforms[start_frame].p, transforms[end_frame].p);
+			}
+			else
+			{
+				// TODO using slerp.
+				transforms[i].q = slerp(t, transforms[start_frame].q, transforms[end_frame].q);
+			}
+		}
+	}
+}
+
+void print_vec3(const PxVec3& v)
+{
+	printf("%f,%f,%f\n", v.x, v.y, v.z);
+}
+
+void print_pose_info(const char* filename)
+{
+	SEAnim_File_t seanim;
+	memset(&seanim, 0, sizeof(SEAnim_File_t));
+	FILE* f;
+	fopen_s(&f, filename, "rb");
+	if (!f)
+	{
+		return;
+	}
+
+	const int r = LoadSEAnim(&seanim, f);
+	fclose(f);
+	if (r != 0)
+	{
+		return;
+	}
+
+	if (seanim.header.animType != SEANIM_TYPE_RELATIVE)
+	{
+		return;
+	}
+
+	if (seanim.header.frameCount <= 1)
+	{
+		return;
+	}
+	/*
+	* tag_origin
+	*		j_mainroot
+	*			|j_spinelower
+	*				j_spineupper
+	*					j_spine4
+	*						j_neck
+	*							j_head
+	*						j_clavicle_le
+	*							j_shoulder_le
+	*								j_elbow_le
+	*									j_wrist_le
+	*						j_calvicle_ri
+	*							j_shoulder_ri
+	*								j_elbow_ri
+	*									j_wrist_ri
+	*			|j_hip_le
+	*				j_knee_le
+	*					j_ankle_le
+	*						j_ball_le
+	*			|j_hip_ri
+	*				j_knee_ri
+	*					j_ankle_ri
+	*						j_ball_ri
+	*/
+
+	static const bone bones[] = {
+		{"tag_origin", -1, PxTransform(PxIdentity)},		// 0
+		{"j_mainroot", 0, PxTransform(PxVec3(-2.565400, -0.000000, 97.028000), mq(90, 0, 90))},		// 1
+		{"j_spinelower", 1, PxTransform(PxVec3(8.973823, 2.565400,-0.000165), mq(0, 0, 0))},	// 2
+		{"j_spineupper", 2, PxTransform(PxVec3(15.875000, 0,0), mq(0, 0, 0))},	// 3
+		{"j_spine4", 3, PxTransform(PxVec3(11.508736, 0, 0), mq(0, 0, 0))},		// 4
+		{"j_neck", 4, PxTransform(PxVec3(22.409206, -2.574906, 0.075798), mq(0.185064,16.826536,0.056054))},			// 5
+		{"j_head", 5, PxTransform(PxIdentity)},			// 6
+		{"j_clavicle_le", 4, PxTransform(PxIdentity)},	// 7
+		{"j_shoulder_le", 7, PxTransform(PxIdentity)},	// 8
+		{"j_elbow_le", 8, PxTransform(PxIdentity)},		// 9
+		{"j_wrist_le", 9, PxTransform(PxIdentity)},		// 10
+		{"j_calvicle_ri", 4, PxTransform(PxIdentity)},	// 11
+		{"j_shoulder_ri", 11, PxTransform(PxIdentity)},	// 12
+		{"j_elbow_ri", 12, PxTransform(PxIdentity)},		// 13
+		{"j_wrist_ri", 13, PxTransform(PxIdentity)},		// 14
+		{"j_hip_le",1, PxTransform(PxIdentity)},			// 15
+		{"j_knee_le", 15, PxTransform(PxIdentity)},		// 16
+		{"j_ankle_le", 16, PxTransform(PxIdentity)},		// 17
+		{"j_ball_le", 17, PxTransform(PxIdentity)},		// 18
+		{"j_hip_ri", 1, PxTransform(PxIdentity)},		// 19
+		{"j_knee_ri", 19, PxTransform(PxIdentity)},		// 20
+		{"j_ankle_ri", 20, PxTransform(PxIdentity)},		// 21
+		{"j_ball_ri", 21, PxTransform(PxIdentity)}		// 22
+	};
+
+	static const int MAX_FRAME_COUNT = 1000;
+
+	static PxTransform bone_transforms[_countof(bones)][MAX_FRAME_COUNT];
+	for (int i = 0; i < _countof(bones); i++)
+	{
+		PxTransform* bone_transform = bone_transforms[i];
+		for (int j = 0; j < seanim.header.frameCount; j++)
+		{
+			bone_transform[j] = PxTransform(PxIdentity);
+		}
+		int bone_index = find_bone(seanim, bones[i].bone_name);
+		if (bone_index >= 0)
+		{
+			const SEAnim_BoneData_t& bone_data = seanim.boneData[bone_index];
+			int last_frame = -1;
+			for (int j = 0; j < bone_data.locKeyCount; j++)
+			{
+				const vec3_t& p = bone_data.loc[j].loc;
+				int frame = bone_data.loc[j].frame;
+				bone_transform[frame].p = PxVec3(p[0], p[1], p[2]);
+				if (last_frame + 1 != frame)
+				{
+					lerp_transform(bone_transform, seanim.header.frameCount, last_frame, frame, true);
+				}
+				last_frame = frame;
+			}
+			if (last_frame + 1 != seanim.header.frameCount)
+			{
+				lerp_transform(bone_transform, seanim.header.frameCount, last_frame, seanim.header.frameCount, true);
+			}
+
+			last_frame = -1;
+			for (int j = 0; j < bone_data.rotKeyCount; j++)
+			{
+				const quat_t& q = bone_data.quats[j].rot;
+				int frame = bone_data.quats[j].frame;
+				bone_transform[frame].q = PxQuat(q[0], q[1], q[2], q[3]);
+				if (last_frame + 1 != frame)
+				{
+					lerp_transform(bone_transform, seanim.header.frameCount, last_frame, frame, false);
+				}
+				last_frame = frame;
+			}
+			if (last_frame + 1 != seanim.header.frameCount)
+			{
+				lerp_transform(bone_transform, seanim.header.frameCount, last_frame, seanim.header.frameCount, false);
+			}
+
+			// https://github.com/dtzxporter/SETools/blob/2714356ff4a8dddbf80f9e76a3ad5b9e181554ba/SEToolsPlugin.py#L1352
+			const PxTransform& ref_transform = bones[i].ref_transform;
+			printf("bone_name:%s\n",  bones[i].bone_name);
+			print_vec3(to_rotator(ref_transform.q));
+			for (int j = 0; j < seanim.header.frameCount; j++)
+			{
+				bone_transform[j].p = ref_transform.p + bone_transform[j].p;
+				print_vec3(to_rotator(bone_transform[j].q));
+				bone_transform[j].q = ref_transform.q * bone_transform[j].q;
+				print_vec3(to_rotator(bone_transform[j].q));
+			}
+			int parent_index = bones[i].parent_index;
+			if (parent_index >= 0)
+			{
+				PxTransform* parent_bone_transform = bone_transforms[parent_index];
+				for (int j = 0; j < seanim.header.frameCount; j++)
+				{
+					bone_transform[j] = parent_bone_transform[j] * bone_transform[j];
+				}
+			}
+		}
+	}
+
+	static const int features_bone_index[] =
+	{
+		6,	// j_head
+		10,	// j_wrist_le
+		14,	// j_wrist_ri
+		18,	// j_ball_le
+		22	// j_ball_ri
+	};
+
+	for (int i = 0; i < seanim.header.frameCount; i++)
+	{
+		printf("%s\t", filename);
+		for (int j = 0; j < _countof(features_bone_index); j++)
+		{
+			const PxTransform& transform = bone_transforms[features_bone_index[j]][i];
+			printf("%.2f,%.2f,%.2f\t", transform.p.x, transform.p.y, transform.p.z);
+		}
+		printf("\n");
+	}
+}
+
+void print_all_pose_info(const char* dir)
+{
 	for (const fs::directory_entry& dir_entry :
 		fs::recursive_directory_iterator(dir))
 	{
 		if (dir_entry.is_regular_file())
 		{
-			SEAnim_File_t seanim;
-			memset(&seanim, 0, sizeof(SEAnim_File_t));
-			FILE* f;
 			const std::string filename = dir_entry.path().string();
-			fopen_s(&f, filename.c_str(), "rb");
-			if (!f)
-			{
-				continue;
-			}
-
-			const int r = LoadSEAnim(&seanim, f);
-			fclose(f);
-			if (r != 0)
-			{
-				continue;
-			}
-
-			if (seanim.header.animType != SEANIM_TYPE_RELATIVE)
-			{
-				continue;
-			}
-
-			if (seanim.header.frameCount <= 1)
-			{
-				continue;
-			}
-			/*
-			* tag_origin
-			*		j_mainroot
-			*			|j_spinelower
-			*				j_spineupper
-			*					j_spine4
-			*						j_neck
-			*							j_head
-			*						j_clavicle_le
-			*							j_shoulder_le
-			*								j_elbow_le
-			*									j_wrist_le
-			*						j_calvicle_ri
-			*							j_shoulder_ri
-			*								j_elbow_ri
-			*									j_wrist_ri
-			*			|j_hip_le
-			*				j_knee_le
-			*					j_ankle_le
-			*						j_ball_le
-			*			|j_hip_ri
-			*				j_knee_ri
-			*					j_ankle_ri
-			*						j_ball_ri
-			*/
-
-			static const bone bones[] = {
-				{"tag_origin", -1},		// 0
-				{"j_mainroot", 0},		// 1
-				{"j_spinelower", 1},	// 2
-				{"j_spineupper", 2},	// 3
-				{"j_spine4", 3},		// 4
-				{"j_neck", 4},			// 5
-				{"j_head", 5},			// 6
-				{"j_clavicle_le", 4},	// 7
-				{"j_shoulder_le", 7},	// 8
-				{"j_elbow_le", 8},		// 9
-				{"j_wrist_le", 9},		// 10
-				{"j_calvicle_ri", 4},	// 11
-				{"j_shoulder_ri", 11},	// 12
-				{"j_elbow_ri", 12},		// 13
-				{"j_wrist_ri", 13},		// 14
-				{"j_hip_le",1},			// 15
-				{"j_knee_le", 15},		// 16
-				{"j_ankle_le", 16},		// 17
-				{"j_ball_le", 17},		// 18
-				{"j_hip_ri", 1},		// 19
-				{"j_knee_ri", 19},		// 20
-				{"j_ankle_ri", 20},		// 21
-				{"j_ball_ri", 21}		// 22
-			};
-
-			int bone_indices[_countof(bones)];
-			for (int i = 0; i < _countof(bones); i++)
-			{
-				bone_indices[i] = find_bone(seanim, bones[i].bone_name);
-			}
-
-			static tranform bone_transforms[_countof(bones)][1000];
-			for (int i = 0; i < _countof(bones); i++)
-			{
-				if (bone_indices[i] >= 0)
-				{
-					const SEAnim_BoneData_t& root_bone = seanim.boneData[bone_indices[i]];
-				}
-				else
-				{
-					for (int j = 0; j < seanim.header.frameCount; j++)
-					{
-						bone_transforms[i][j] = tranform::identity;
-					}
-				}
-			}
-			
-			float start_speed = 0.0f;
-			float end_speed = 0.0f;
-
-			if (root_bone_index >= 0)
-			{
-				const SEAnim_BoneData_t& root_bone = seanim.boneData[root_bone_index];
-
-				if (root_bone.locKeyCount >= 3)
-				{
-					start_speed = calc_speed(root_bone, 0, 2, seanim.header.framerate);
-					end_speed = calc_speed(root_bone, root_bone.locKeyCount - 3, root_bone.locKeyCount - 1, seanim.header.framerate);
-				}
-			}
-
-			accinfos.push_back(accinfo{ filename, (int)seanim.header.frameCount, (int)seanim.header.boneCount, start_speed, end_speed, seanim.header.framerate });
+			print_pose_info(filename.c_str());
 		}
-	}
-	std::sort(accinfos.begin(), accinfos.end());
-	printf("filename\tbone_count\tframe_count\tstart_speed\tend_speed\tframerate\n");
-	for (size_t i = 0; i < accinfos.size(); i++)
-	{
-		const accinfo& info = accinfos[i];
-		printf("%s\t%d\t%d\t%f\t%f\t%f\n", info.filename.c_str(), info.bone_count, info.frame_count, info.start_speed, info.end_speed, info.framerate);
 	}
 }
 
@@ -302,7 +384,7 @@ int main(int argc, char *argv[])
 	//	return 0;
 	//}
 
-	matching("G:/CODResources/Animations/seanims");
+	print_pose_info("G:/CODResources/sdr/com/strafe/jog/8.seanim");
 	return 0;
 
 	SEAnim_File_t seanim;

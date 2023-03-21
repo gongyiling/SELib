@@ -46,7 +46,7 @@ int SELIB_API LoadSEAnim(SEAnim_File_t *dest, SELIB_FS_HANDLE handle)
 			{
 				__SELib_internal_ReadVariableLengthNumber(numSize, &dest->boneData[i].loc[o].frame, handle); // read frame index
 				__SELib_internal_ReadVector3FromFile(dest->header.dataPropertyFlags, &dest->boneData[i].loc[o].loc, handle); // read keyframe data
-
+				assert(dest->boneData[i].loc[o].loc[2]>-80);
 				SELib_Printf("Frame %u (Bone %d): loc %f %f %f\n", dest->boneData[i].loc[o].frame, i, dest->boneData[i].loc[o].loc[0], dest->boneData[i].loc[o].loc[1], dest->boneData[i].loc[o].loc[2]);
 			}
 		}

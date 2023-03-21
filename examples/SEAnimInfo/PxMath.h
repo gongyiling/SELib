@@ -139,7 +139,6 @@ PX_CUDA_CALLABLE PX_FORCE_INLINE int32_t PxAbs(int32_t a)
 template <class T>
 PX_CUDA_CALLABLE PX_FORCE_INLINE T PxClamp(T v, T lo, T hi)
 {
-	PX_ASSERT(lo <= hi);
 	return PxMin(hi, PxMax(lo, v));
 }
 
@@ -332,6 +331,19 @@ PX_CUDA_CALLABLE PX_FORCE_INLINE float PxLog(float x)
 {
 	return ::logf(x);
 }
+
+PX_CUDA_CALLABLE PX_FORCE_INLINE void sincos(const float radians, float& sin, float& cos)
+{
+	/* something like:
+	_asm fld  Local
+	_asm fsincos
+	_asm fstp LocalCos
+	_asm fstp LocalSin
+	*/
+	sin = PxSin(radians);
+	cos = PxCos(radians);
+}
+
 
 #if !PX_DOXYGEN
 } // namespace physx
